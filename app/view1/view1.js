@@ -27,12 +27,13 @@ angular.module('myApp.view1', ['ngRoute'])
   // WebSocket implementation
   $scope.status = 'Disconnected';
   $scope.username = '';
+  $scope.players = [];
   $scope.socket = '';
   $scope.checked = 1;
   $scope.history = [];
 
   $scope.join = function () {
-    var socket = new WebSocket('ws://localhost:8080/', 'echo-protocol');
+    var socket = new WebSocket('ws://localhost:8080/', 'chat-protocol');
 
     socket.addEventListener('open', function (event) {
       $scope.$apply(function () {
@@ -53,7 +54,9 @@ angular.module('myApp.view1', ['ngRoute'])
 
     socket.addEventListener('message', function (event) {
       $scope.$apply(function () {
-        $scope.history.push(JSON.parse(event.data));
+        var message = JSON.parse(event.data)
+        console.log(message.new);
+        message.new ? $scope.players.push(message) : $scope.history.push(message);
       });
     });
 
@@ -75,6 +78,9 @@ angular.module('myApp.view1', ['ngRoute'])
   var current_span, total, start;
   $scope.raw = '';
   $scope.sanitized = [];
+  $scope.arr_wpm = [];
+  $scope.wpm = 0;
+
   $scope.$watch("raw", function(newValue) {
     $scope.sanitized = newValue.split(' ').filter(function (elem) {
       return elem.replace(/\s/gmi, '');
@@ -83,29 +89,33 @@ angular.module('myApp.view1', ['ngRoute'])
     });
   });
 
-  $scope.arr_wpm = [];
-  $scope.wpm = 0;
-  $scope.$watch('sanitized', function () {
-    current_span = document.getElementById('sanitized').firstElementChild;
-    if (current_span){
-      current_span.className = current_span.className + ' active';
-    }
-  });
-
   total = start = new Date();
 
   angular.element(document.querySelector('#input')).on('keydown', function (event) {
+    if (typeof current_span == "null") {
+      // todo: handle no raw text scenario
+      console.log("Please Enter Text");
+    }
+    if (typeof current_span == "undefined") {
+      current_span = document.getElementById('sanitized').firstElementChild;
+    }
+    current_span.className = current_span.className + ' active';
 
     if (event.keyCode === 32) {
       var current = this.value.trim();
 
       if (current === current_span.innerHTML) {
+
         var end = new Date();
         $scope.arr_wpm.push(end - start);
+
         total += $scope.arr_wpm[$scope.arr_wpm.length - 1];
         start = end;
+
         current_span.className = 'word';
+
         current_span = current_span.nextElementSibling;
+
         if (current_span) {
           current_span.className = current_span.className + ' active';
         } else {
@@ -117,7 +127,7 @@ angular.module('myApp.view1', ['ngRoute'])
           }
         }
       } else {
-        current_span.className = current_span.className + ' error';
+        current_span.className = current_span.className + ' word-error';
       }
       this.value = '';
     }

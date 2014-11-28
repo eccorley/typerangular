@@ -7,14 +7,7 @@ var http = require('http');
 var app = express();
 var history = [];
 var clients = [];
-
-/**
- * Helper function for escaping input strings
- */
-function htmlEntities(str) {
-    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-}
+var players = [];
 
 var server = http.createServer(function(request, response) {
     console.log((new Date()) + ' Received request for ' + request.url);
@@ -47,7 +40,7 @@ function originIsAllowed(origin) {
 wsServer.on('request', function(request) {
 
 
-    var connection = request.accept('echo-protocol', request.origin);
+    var connection = request.accept('chat-protocol', request.origin);
     var index = clients.push(connection) - 1;
     console.log((new Date()) + ' Connection accepted.');
 
@@ -63,13 +56,11 @@ wsServer.on('request', function(request) {
                 time: (new Date().getTime()),
                 message: message.utf8Data
             };
-            console.log(JSON.parse(obj.message));
-            history.push(obj);
+            JSON.parse(obj.message).new ? players.push(obj) : history.push(obj);
             history = history.slice(-100);
 
             var json = obj.message;
             for (var i = 0; i < clients.length; i++) {
-                console.log(json);
                 clients[i].sendUTF(json);
             }
         }
@@ -99,7 +90,7 @@ client.on('connect', function(connection) {
         console.log("Connection Error: " + error.toString());
     });
     connection.on('close', function() {
-        console.log('echo-protocol Connection Closed');
+        console.log('chat-protocol Connection Closed');
     });
     connection.on('message', function(message) {
         if (message.type === 'utf8') {
@@ -117,4 +108,4 @@ client.on('connect', function(connection) {
 
 });
 
-client.connect('ws://localhost:8080/', 'echo-protocol');
+client.connect('ws://localhost:8080/', 'chat-protocol');

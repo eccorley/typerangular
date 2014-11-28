@@ -8,7 +8,7 @@ textarea#text_to_type {
 }
 
 span.word {
-  display: inline;
+  display: inline-block;
   margin: 0 3px;
 }
 
@@ -17,7 +17,7 @@ span.active {
   color: green;
   transition: color 500ms ease;
 }
-span.error {
+span.word-error {
   text-decoration: underline;
   color: red;
   transition: color 500ms ease;
