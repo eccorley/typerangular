@@ -1,0 +1,24 @@
+/* app css stylesheet */
+body {
+  font: 300 1em 'Helvetica Neue'
+}
+
+textarea#text_to_type {
+  height: 150px;
+}
+
+span.word {
+  display: inline;
+  margin: 0 3px;
+}
+
+span.active {
+  text-decoration: underline;
+  color: green;
+  transition: color 500ms ease;
+}
+span.error {
+  text-decoration: underline;
+  color: red;
+  transition: color 500ms ease;
+}

@@ -1,0 +1,36 @@
+<h1>Typerangular</h1>
+<div class="row">
+    <div class="large-8 columns">
+        <h4>Paste the text you'd like to type, then type it and see your speed!</h4>
+        <textarea id="text_to_type" ng-model="raw"></textarea>
+        <div id="sanitized">
+            <span ng-repeat="word in sanitized track by $index" class="word">{{ word }}</span>
+        </div>
+        <input id="input" type="text" autofocus/>
+        <h4 id="wpm">{{ wpm }} Words Per Minute</h4>
+    </div>
+</div>
+<h1>Chatroom Example</h1>
+<div class="row">
+    <ul id="history">
+        <li ng-repeat="item in history">
+            <span ng-bind="item.username"></span>:
+            <span ng-bind="item.message"></span>
+        </li>
+    </ul>
+    <div>
+        Total Items: <span id="item-count" ng-bind="history.length"></span>
+    </div>
+    <div id="chatbox">
+        Status: <span id="status" ng-bind="status"></span><br />
+
+        <div ng-show="checked">
+            <input id="join" type="button" value="Join" ng-click="join()" />&nbsp;
+            <input id="new_username" ng-model="new_username" /><br />
+        </div>
+        <div ng-hide="checked">
+            <input id="send" type="button" value="Send" ng-click="send()" />&nbsp;
+            <input id="text" ng-model="message" /><br />
+        </div>
+    </div>
+</div>
