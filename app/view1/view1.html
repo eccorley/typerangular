@@ -7,13 +7,13 @@
             <span ng-repeat="word in sanitized track by $index" class="word">{{ word }}</span>
         </div>
         <input id="input" type="text" autofocus/>
-        <h4 id="wpm">{{ wpm }} Words Per Minute</h4>
+        <h4 id="wpm">{{ wpm | number: 1 }} Words Per Minute</h4>
     </div>
 
     <div class="large-4 columns">
         <h1>Chatroom Example</h1>
         <ul id="history">
-            <li ng-repeat="item in history">
+            <li ng-repeat="item in history" ng-show="!$first">
                 <span ng-bind="item.username"></span>:
                 <span ng-bind="item.message"></span>
             </li>

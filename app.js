@@ -57,6 +57,7 @@ wsServer.on('request', function(request) {
                 message: message.utf8Data
             };
             JSON.parse(obj.message).new ? players.push(obj) : history.push(obj);
+            console.log(history);
             history = history.slice(-100);
 
             var json = obj.message;

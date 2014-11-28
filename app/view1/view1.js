@@ -57,6 +57,7 @@ angular.module('myApp.view1', ['ngRoute'])
         var message = JSON.parse(event.data)
         console.log(message.new);
         message.new ? $scope.players.push(message) : $scope.history.push(message);
+        console.log($scope.history);
       });
     });
 
@@ -120,7 +121,10 @@ angular.module('myApp.view1', ['ngRoute'])
           current_span.className = current_span.className + ' active';
         } else {
           for (var i = 0; i < $scope.arr_wpm.length - 1; i++) {
-            var sum = $scope.arr_wpm[i] + $scope.arr_wpm[i + 1];
+            $scope.arr_wpm = $scope.arr_wpm.slice(1);
+            if ($scope.arr_wpm[i+1]) {
+              var sum = $scope.arr_wpm[i] + $scope.arr_wpm[i + 1];
+            }
             $scope.$apply(function () {
               $scope.wpm = sum / $scope.arr_wpm.length;
             })
