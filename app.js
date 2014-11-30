@@ -48,21 +48,37 @@ wsServer.on('request', function(request) {
         connection.sendUTF(JSON.stringify( { type: 'history', data: history} ));
     }
 
+    if (players.length > 0) {
+        connection.sendUTF(JSON.stringify(players));
+    }
+
     connection.on('message', function(message) {
+
         if (message.type === 'utf8') {
             console.log('Received Message: ' + message.utf8Data);
 
-            var obj = {
-                time: (new Date().getTime()),
-                message: message.utf8Data
-            };
-            JSON.parse(obj.message).new ? players.push(obj) : history.push(obj);
-            console.log(history);
+            var obj = JSON.parse(message.utf8Data);
+            console.log(obj);
+            switch (obj.type) {
+                case 'player':
+                    players.push({
+                        type: obj.type,
+                        playerName: obj.playerName,
+                        playerIndex: index,
+                        progress: obj.progress
+                    });
+                    break;
+                case 'message':
+                    history.push(obj);
+                    break;
+            }
+            console.log(players);
             history = history.slice(-100);
 
-            var json = obj.message;
+            var json = JSON.stringify(obj);
             for (var i = 0; i < clients.length; i++) {
                 clients[i].sendUTF(json);
+                clients[i].sendUTF(JSON.stringify(players));
             }
         }
         else if (message.type === 'binary') {

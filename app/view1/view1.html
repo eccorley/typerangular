@@ -1,12 +1,16 @@
 <div class="row">
     <div class="large-8 columns">
         <h1>Typerangular</h1>
+        <ul id="scoreBoard">
+            <li ng-repeat="player in players">{{ player.playerName }} {{ player.progress }} <div class="progress radius"> <span class="meter" style="width: {{ player.progress  | percentage: 0 }}"></span> </div></li>
+        </ul>
         <h4>Paste the text you'd like to type, then type it and see your speed!</h4>
         <textarea id="text_to_type" ng-model="raw"></textarea>
-        <div id="sanitized">
+        <div id="sanitized" class="panel">
             <span ng-repeat="word in sanitized track by $index" class="word">{{ word }}</span>
         </div>
         <input id="input" type="text" autofocus/>
+        <h4 id="progress">Progress: {{ progress | percentage: 0 }}</h4>
         <h4 id="wpm">{{ wpm | number: 1 }} Words Per Minute</h4>
     </div>
 
@@ -30,7 +34,7 @@
                 <input id="new_username" ng-model="new_username" /><br />
             </div>
             <div ng-hide="checked">
-                <input id="send" type="button" value="Send" ng-click="send()" />&nbsp;
+                <input id="send" type="button" value="Send" ng-click="sendMessage()" />&nbsp;
                 <input id="text" ng-model="message" /><br />
             </div>
         </div>

@@ -3,6 +3,14 @@ body {
   font: 300 1em 'Helvetica Neue'
 }
 
+div[ng-view] {
+  margin-top: 50px;
+}
+
+ul#scoreBoard {
+  list-style-type: none;
+}
+
 textarea#text_to_type {
   height: 150px;
 }

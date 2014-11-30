@@ -31,6 +31,8 @@ angular.module('myApp.view1', ['ngRoute'])
   $scope.socket = '';
   $scope.checked = 1;
   $scope.history = [];
+  $scope.progress = 0;
+  $scope.passage = '';
 
   $scope.join = function () {
     var socket = new WebSocket('ws://localhost:8080/', 'chat-protocol');
@@ -41,8 +43,11 @@ angular.module('myApp.view1', ['ngRoute'])
         $scope.checked = 0;
         $scope.username = $scope.new_username;
         socket.send(
-            angular.toJson({new: $scope.new_username})
-        );
+            angular.toJson({
+              type: 'player',
+              playerName: $scope.new_username,
+              progress: 0
+            }));
       });
     });
 
@@ -54,23 +59,59 @@ angular.module('myApp.view1', ['ngRoute'])
 
     socket.addEventListener('message', function (event) {
       $scope.$apply(function () {
-        var message = JSON.parse(event.data)
-        console.log(message.new);
-        message.new ? $scope.players.push(message) : $scope.history.push(message);
-        console.log($scope.history);
+        var message = JSON.parse(event.data);
+        switch (message.type) {
+          case 'progress':
+            // TODO: Progress not updating in view ng-repeat
+            $scope.players[message.playerIndex - 1].progress = message.progress;
+            break;
+          case 'passage':
+            $scope.sanitized = $scope.sanitize(message.passage);
+            break;
+          case 'message':
+            $scope.history.push(message);
+            break;
+          case 'history':
+            console.log(message);
+            break;
+          default:
+            if (message.playerName) {
+              break;
+            } else if (message.length) {
+              $scope.players = message;
+            }
+        }
       });
     });
 
     $scope.socket = socket;
   };
 
-  $scope.send = function () {
+
+  $scope.sendMessage = function () {
     $scope.socket.send(
         angular.toJson({
+          type: 'message',
           username: $scope.username,
           message: $scope.message
         }));
     $scope.message = '';
+  };
+
+  $scope.sendPassage = function () {
+    $scope.socket.send(
+        angular.toJson({
+          type: 'passage',
+          passage: $scope.raw
+        }));
+  };
+
+  $scope.sanitize = function (rawText) {
+    return rawText.split(' ').filter(function (elem) {
+      return elem.replace(/\s/gmi, '');
+    }).map(function (elem) {
+      return elem.trim();
+    });
   };
 
 
@@ -104,6 +145,7 @@ angular.module('myApp.view1', ['ngRoute'])
 
     if (event.keyCode === 32) {
       var current = this.value.trim();
+      var passageSpans =  angular.element(document.querySelector('#sanitized').children);
 
       if (current === current_span.innerHTML) {
 
@@ -114,6 +156,23 @@ angular.module('myApp.view1', ['ngRoute'])
         start = end;
 
         current_span.className = 'word';
+
+        $scope.$apply(function () {
+          $scope.progress = (Array.prototype.indexOf.call(passageSpans, current_span) + 1) / passageSpans.length;
+        });
+
+
+
+        $scope.socket.send(
+            angular.toJson({
+              type: 'progress',
+              playerIndex: $scope.players.filter(function (val) {
+                return val.playerName = $scope.username;
+              })[0].playerIndex,
+              username: $scope.username,
+              progress: $scope.progress
+            }));
+
 
         current_span = current_span.nextElementSibling;
 
