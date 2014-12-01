@@ -8,7 +8,7 @@ var app = express();
 var history = [];
 var clients = [];
 var players = [];
-
+var passage = "Miss Spink and Miss Forcible lived in the flat below Coraline's, on the ground floor. They were both old and round, and they lived in their flat with a number of ageing highland terriers who had names like Hamish and Andrew and Jock. Once upon a time Miss Spink and Miss Forcible had been actresses, as Miss Spink told Coraline the first time she met her.";
 var server = http.createServer(function(request, response) {
     console.log((new Date()) + ' Received request for ' + request.url);
     response.writeHead(404);
@@ -68,9 +68,15 @@ wsServer.on('request', function(request) {
                         progress: obj.progress
                     });
                     break;
+                case 'progress':
+                    console.log(obj.progress);
+                    players[index - 1].progress = obj.progress;
+                    break;
                 case 'message':
                     history.push(obj);
                     break;
+                case 'passage':
+                    passage = obj.passage
             }
             console.log(players);
             history = history.slice(-100);
@@ -79,6 +85,10 @@ wsServer.on('request', function(request) {
             for (var i = 0; i < clients.length; i++) {
                 clients[i].sendUTF(json);
                 clients[i].sendUTF(JSON.stringify(players));
+                clients[i].sendUTF(JSON.stringify({
+                    type: 'passage',
+                    passage: passage
+                }));
             }
         }
         else if (message.type === 'binary') {

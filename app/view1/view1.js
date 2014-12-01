@@ -42,6 +42,11 @@ angular.module('myApp.view1', ['ngRoute'])
         $scope.status = 'Connected';
         $scope.checked = 0;
         $scope.username = $scope.new_username;
+        $scope.progress = 0;
+        if (current_span) {
+          current_span.className = 'word';
+          current_span = document.getElementById('sanitized').firstElementChild;
+        }
         socket.send(
             angular.toJson({
               type: 'player',
@@ -62,17 +67,19 @@ angular.module('myApp.view1', ['ngRoute'])
         var message = JSON.parse(event.data);
         switch (message.type) {
           case 'progress':
-            // TODO: Progress not updating in view ng-repeat
             $scope.players[message.playerIndex - 1].progress = message.progress;
             break;
           case 'passage':
+            $scope.raw = message.passage;
             $scope.sanitized = $scope.sanitize(message.passage);
             break;
           case 'message':
             $scope.history.push(message);
             break;
           case 'history':
-            console.log(message);
+            message.data.forEach(function (msg) {
+              $scope.history.push(msg);
+            });
             break;
           default:
             if (message.playerName) {
@@ -85,6 +92,14 @@ angular.module('myApp.view1', ['ngRoute'])
     });
 
     $scope.socket = socket;
+    $scope.$watch("raw", function(newValue) {
+      $scope.socket.send(
+          angular.toJson({
+            type: 'passage',
+            passage: newValue
+          })
+      );
+    });
   };
 
 
@@ -96,14 +111,6 @@ angular.module('myApp.view1', ['ngRoute'])
           message: $scope.message
         }));
     $scope.message = '';
-  };
-
-  $scope.sendPassage = function () {
-    $scope.socket.send(
-        angular.toJson({
-          type: 'passage',
-          passage: $scope.raw
-        }));
   };
 
   $scope.sanitize = function (rawText) {
@@ -118,18 +125,10 @@ angular.module('myApp.view1', ['ngRoute'])
 
   // Text input/output module
   var current_span, total, start;
-  $scope.raw = '';
-  $scope.sanitized = [];
+  $scope.raw = "Miss Spink and Miss Forcible lived in the flat below Coraline's, on the ground floor. They were both old and round, and they lived in their flat with a number of ageing highland terriers who had names like Hamish and Andrew and Jock. Once upon a time Miss Spink and Miss Forcible had been actresses, as Miss Spink told Coraline the first time she met her.";
+  $scope.sanitized = $scope.sanitize($scope.raw);
   $scope.arr_wpm = [];
   $scope.wpm = 0;
-
-  $scope.$watch("raw", function(newValue) {
-    $scope.sanitized = newValue.split(' ').filter(function (elem) {
-      return elem.replace(/\s/gmi, '');
-    }).map(function (elem) {
-      return elem.trim();
-    });
-  });
 
   total = start = new Date();
 
@@ -163,15 +162,17 @@ angular.module('myApp.view1', ['ngRoute'])
 
 
 
-        $scope.socket.send(
-            angular.toJson({
-              type: 'progress',
-              playerIndex: $scope.players.filter(function (val) {
-                return val.playerName = $scope.username;
-              })[0].playerIndex,
-              username: $scope.username,
-              progress: $scope.progress
-            }));
+        if ($scope.socket) {
+          $scope.socket.send(
+              angular.toJson({
+                type: 'progress',
+                playerIndex: $scope.players.filter(function (val) {
+                  return val.playerName = $scope.username;
+                })[0].playerIndex,
+                username: $scope.username,
+                progress: $scope.progress
+              }));
+        }
 
 
         current_span = current_span.nextElementSibling;
