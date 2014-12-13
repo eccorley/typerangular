@@ -1,9 +1,12 @@
 <div class="row">
+    <aside class="large-3 columns">
+        <h4>Scoreboard</h4>
+        <ul id="scoreBoard">
+            <li ng-repeat="player in players">{{ player.playerName }}: {{ player.progress | percentage: 0 }} </li>
+        </ul>
+    </aside>
     <div class="large-8 columns">
         <h1>Typerangular</h1>
-        <ul id="scoreBoard">
-            <li ng-repeat="player in players">{{ player.playerName }} {{ player.progress | percentage: 0 }} <div class="progress radius"> <span class="meter" style="width: {{ player.progress  | percentage: 0 }}"></span> </div></li>
-        </ul>
         <h4>Paste the text you'd like to type, then type it and see your speed!</h4>
         <textarea id="text_to_type" ng-model="raw"></textarea>
         <div id="sanitized" class="panel">
@@ -14,7 +17,7 @@
         <h4 id="wpm">{{ wpm | number: 1 }} Words Per Minute</h4>
     </div>
 
-    <div class="large-4 columns">
+    <div class="large-2 columns">
         <h1>Chatroom Example</h1>
         <ul id="history">
             <li ng-repeat="item in history">

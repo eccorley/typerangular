@@ -81,6 +81,9 @@ angular.module('myApp.view1', ['ngRoute'])
               $scope.history.push(msg);
             });
             break;
+          case 'victory':
+            console.log('received');
+            break;
           default:
             if (message.playerName) {
               break;
@@ -135,7 +138,6 @@ angular.module('myApp.view1', ['ngRoute'])
   angular.element(document.querySelector('#input')).on('keydown', function (event) {
     if (typeof current_span == "null") {
       // todo: handle no raw text scenario
-      console.log("Please Enter Text");
     }
     if (typeof current_span == "undefined") {
       current_span = document.getElementById('sanitized').firstElementChild;
@@ -196,4 +198,5 @@ angular.module('myApp.view1', ['ngRoute'])
       this.value = '';
     }
   });
+
 }]);

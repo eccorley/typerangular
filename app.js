@@ -76,19 +76,29 @@ wsServer.on('request', function(request) {
                     history.push(obj);
                     break;
                 case 'passage':
-                    passage = obj.passage
+                    passage = obj.passage;
+                    for (var j = 0; j < players.length; j++) {
+                        players[j].progress = 0;
+                    }
+                    break;
             }
-            console.log(players);
             history = history.slice(-100);
 
             var json = JSON.stringify(obj);
-            for (var i = 0; i < clients.length; i++) {
-                clients[i].sendUTF(json);
-                clients[i].sendUTF(JSON.stringify(players));
-                clients[i].sendUTF(JSON.stringify({
+            for (var k = 0; k < clients.length; k++) {
+                clients[k].sendUTF(json);
+                clients[k].sendUTF(JSON.stringify(players));
+                clients[k].sendUTF(JSON.stringify({
                     type: 'passage',
                     passage: passage
                 }));
+                if (players[k] && players[k].progress == 1) {
+                    clients[k].sendUTF(JSON.stringify({
+                        type: 'victory',
+                        player: players[k]
+                    }));
+                    console.log('Sent victory');
+                }
             }
         }
         else if (message.type === 'binary') {

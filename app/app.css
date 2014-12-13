@@ -7,6 +7,20 @@ div[ng-view] {
   margin-top: 10px;
 }
 
+aside {
+  position: absolute;
+  margin-left: -50px;
+  margin-right: -50px;
+  top: 70px;
+  left: -65px;
+  text-align: left;
+}
+
+aside h4 {
+  text-align: center;
+  text-decoration: underline;
+}
+
 ul#scoreBoard {
   list-style-type: none;
 }
